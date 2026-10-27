@@ -58,55 +58,79 @@ Socket programming finds applications in various domains, including web developm
 4.	Networked Games: Online multiplayer games rely on socket programming to facilitate communication between game clients and servers.
 5.	RPC mechanisms: which allow processes to execute code on a remote server, often use socket programming for communication.
 ## `client.py`
+TCP
 ```python
 import socket
 
-# Create a socket object
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Connect to the server
-client_socket.connect(('localhost', 8000))
+server.bind(('localhost', 12345))
+server.listen(1)
 
-# Print the client's socket name
-print(f"Client connected from: {client_socket.getsockname()}")
+print("Server is waiting for connection...")
 
-# Receive a message from the server
-server_message = client_socket.recv(1024).decode()
-print(f"Received from server: {server_message}")
+conn, addr = server.accept()
+print("Client connected")
 
-# Send a message to the server
-client_socket.send("Acknowledgement received from the client.".encode())
+data = conn.recv(1024).decode()
+print("Message from client:", data)
 
-# Close the connection
-client_socket.close()
-server.py
+conn.send("Hello from Server".encode())
+
+conn.close()
+server.close()
+```
+UDP
+```
 import socket
 
-# Create a socket object
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# Bind the socket to the host and port
-server_socket.bind(('localhost', 8000))
+server.bind(('localhost', 12345))
 
-# Listen for incoming connections (max 1 connection)
-server_socket.listen(1)
-print("Server is waiting for a connection...")
+print("UDP Server is waiting for message...")
 
-# Accept the connection
-conn, addr = server_socket.accept()
-print(f"Connected by {addr}")
+data, addr = server.recvfrom(1024)
+print("Message from client:", data.decode())
 
-# Send a message to the client
-conn.send("Hello from the server!".encode())
+server.sendto("Hello from UDP Server".encode(), addr)
 
-# Receive a message from the client
-data = conn.recv(1024)
-print(f"Received from client: {data.decode()}")
-
-# Close the connection
-conn.close()
-server_socket.close()
+server.close()
 ```
+Client –Server Operations
+Clients create a socket using socket() and connect to a server using connect(). After establishing a connection, clients can send and receive data using send() and recv().
+
+TCP
+```
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+client.connect(('localhost', 12345))
+
+client.send("Hello from Client".encode())
+
+data = client.recv(1024).decode()
+print("Message from server:", data)
+
+client.close()
+```
+UDP
+```
+
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+client.sendto("Hello from UDP Client".encode(), ('localhost', 12345))
+
+data, addr = client.recvfrom(1024)
+print("Message from server:", data.decode())
+
+client.close()
+```
+
+
 
 ## OUTPUT:
 ### CLIENT:
